@@ -1,22 +1,24 @@
-use actix_web::{get, web, App, HttpResponse, HttpServer, Responder};
+use actix_web::{get, web, App, HttpRequest, HttpResponse, HttpServer, Responder};
 
 #[get("/")]
 async fn hello() -> impl Responder {
     HttpResponse::Ok().body("Hello Word")
 }
 
-async fn manual_hello() -> impl Responder {
-    HttpResponse::Ok().body("Hey there")
+async fn greet(req: HttpRequest) -> impl Responder {
+    let name = req.match_info().get("name").unwrap_or("World");
+    format!("Hello {}!", &name)
 }
 
-#[actix_web::main]
-async fn main() -> std::io::Result<()> {
+#[tokio::main]
+async fn main() -> Result<(), std::io::Error> {
     HttpServer::new(|| {
         App::new()
             .service(hello)
-            .route("/hey", web::get().to(manual_hello))
+            .route("/", web::get().to(greet))
+            .route("/{name}", web::get().to(greet))
     })
-    .bind(("127.0.0.1", 8080))?
+    .bind("127.0.0.1:8080")?
     .run()
     .await
 }
