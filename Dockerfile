@@ -11,7 +11,8 @@ COPY . .
 ENV SQLX_OFFLIN=true
 # Let's build our binary!
 # We'll use the release profile to make it faaaast
-RUN cargo build --release
+RUN cargo build --release --bin zero2prod
+
 ENV APP_ENVIRONMENT=production
 # When `docker run` is executed, launch the binary!
 ENTRYPOINT ["./target/release/zero2prod"]
